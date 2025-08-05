@@ -34,6 +34,8 @@ const API_BASE = import.meta.env.VITE_API_URL;
 const App = () => {
   const [status, setStatus] = useState("disconnected");
   const [qrCode, setQrCode] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   
   // FIX 1: Add AI fields to initial state
   const [config, setConfig] = useState({
@@ -351,104 +353,147 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
-              <MessageCircle className="w-8 h-8 text-green-500" />
-              <h1 className="text-2xl font-bold text-gray-900">Nia.io</h1>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div
-                className={`flex items-center space-x-2 ${getStatusColor()}`}
-              >
-                {getStatusIcon()}
-                <span className="font-medium capitalize">
-                  {status.replace("-", " ")}
-                </span>
-              </div>
-
-              <div className="flex space-x-2">
-                {status === "connected" ? (
-                  <button
-                    onClick={stopBot}
-                    disabled={loading}
-                    className="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
-                  >
-                    <Square className="w-4 h-4" />
-                    <span>Stop</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={startBot}
-                    disabled={loading}
-                    className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
-                  >
-                    <Play className="w-4 h-4" />
-                    <span>Start</span>
-                  </button>
-                )}
-
-                <button
-                  onClick={logout}
-                  disabled={loading}
-                  className="flex items-center space-x-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Header + Navigation */}
+<div className="bg-white shadow-sm border-b">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    {/* Header */}
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 space-y-4 sm:space-y-0">
+      {/* Logo */}
+      <div className="flex items-center space-x-2">
+        <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Nexalog</h1>
       </div>
 
-      {/* Notification */}
-      {notification && (
-        <div
-          className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
-            notification.type === "success"
-              ? "bg-green-500"
-              : notification.type === "error"
-              ? "bg-red-500"
-              : "bg-blue-500"
-          } text-white`}
+      {/* Status + Controls */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+        <div className={`flex items-center space-x-2 ${getStatusColor()}`}>
+          {getStatusIcon()}
+          <span className="text-sm font-medium capitalize">
+            {status.replace("-", " ")}
+          </span>
+        </div>
+
+        {/* Control Buttons */}
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          {status === "connected" ? (
+            <button
+              onClick={stopBot}
+              disabled={loading}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 w-full sm:w-auto"
+            >
+              <Square className="w-4 h-4" />
+              <span>Stop</span>
+            </button>
+          ) : (
+            <button
+              onClick={startBot}
+              disabled={loading}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 w-full sm:w-auto"
+            >
+              <Play className="w-4 h-4" />
+              <span>Start</span>
+            </button>
+          )}
+
+          <button
+            onClick={logout}
+            disabled={loading}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 w-full sm:w-auto"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {/* Navigation */}
+    <div className="flex justify-between items-center py-2 sm:py-0">
+      {/* Always show Dashboard */}
+      <button
+        onClick={() => setActiveTab("dashboard")}
+        className={`flex items-center space-x-2 py-2 px-3 rounded-md font-medium text-sm ${
+          activeTab === "dashboard"
+            ? "bg-green-100 text-green-600"
+            : "text-gray-700 hover:bg-gray-100"
+        }`}
+      >
+        <MessageCircle className="w-4 h-4" />
+        <span>Dashboard</span>
+      </button>
+
+      {/* Hamburger for small screens */}
+      <div className="sm:hidden">
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="text-gray-700 hover:text-gray-900 focus:outline-none"
         >
-          {notification.message}
-        </div>
-      )}
-
-      {/* Navigation */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8">
-            {[
-              { id: "dashboard", label: "Dashboard", icon: MessageCircle },
-              { id: "contacts", label: "Contacts", icon: Users },
-              { id: "groups", label: "Groups", icon: Users },
-              { id: "messages", label: "Messages", icon: MessageCircle },
-              { id: "settings", label: "Settings", icon: Settings },
-              { id: "ai", label: "AI", icon: Shield }
-
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 py-4 px-2 border-b-2 font-medium text-sm ${
-                  activeTab === tab.id
-                    ? "border-green-500 text-green-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {isMenuOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
       </div>
+
+      {/* Desktop Tabs */}
+      <div className="hidden sm:flex space-x-6">
+        {[
+          { id: "contacts", label: "Contacts", icon: Users },
+          { id: "groups", label: "Groups", icon: Users },
+          { id: "messages", label: "Messages", icon: MessageCircle },
+          { id: "settings", label: "Settings", icon: Settings },
+          { id: "ai", label: "AI", icon: Shield },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center space-x-2 py-2 px-3 rounded-md font-medium text-sm ${
+              activeTab === tab.id
+                ? "bg-green-100 text-green-600"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <tab.icon className="w-4 h-4" />
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* Mobile Tabs */}
+    {isMenuOpen && (
+      <div className="sm:hidden mt-2 space-y-1 pb-4">
+        {[
+          { id: "contacts", label: "Contacts", icon: Users },
+          { id: "groups", label: "Groups", icon: Users },
+          { id: "messages", label: "Messages", icon: MessageCircle },
+          { id: "settings", label: "Settings", icon: Settings },
+          { id: "ai", label: "AI", icon: Shield },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => {
+              setActiveTab(tab.id);
+              setIsMenuOpen(false);
+            }}
+            className={`w-full flex items-center space-x-2 py-2 px-3 rounded-md font-medium text-sm ${
+              activeTab === tab.id
+                ? "bg-green-100 text-green-600"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <tab.icon className="w-4 h-4" />
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
+
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
