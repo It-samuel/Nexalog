@@ -1,4 +1,7 @@
-name: Build and deploy Vite React app to Azure Web App - nexalog
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy Node.js app to Azure Web App - nexalog
 
 on:
   push:
@@ -9,35 +12,42 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read #This is required for actions/checkout
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # use 18 LTS or compatible
+          node-version: '22.x'
 
-      - name: Install dependencies
-        run: npm install
+      - name: npm install, build, and test
+        run: |
+          npm install
+          npm run build --if-present
+          npm run test --if-present
 
-      - name: Build the app
-        run: npm run build
-
-      - name: Upload artifact
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: vite-app
-          path: dist
+          name: node-app
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
     steps:
-      - name: Download artifact
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: vite-app
-
+          name: node-app
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -45,9 +55,11 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EE044E45F988418E82E83AE997027FE6 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5C716FC3B3944BE88567C3AA6567FC30 }}
 
-      - name: Deploy to Azure Web App
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'nexalog'
           slot-name: 'Production'
-          package: .
+          package: dist
+          
