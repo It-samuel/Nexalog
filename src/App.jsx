@@ -362,6 +362,13 @@ const App = () => {
       <div className="flex items-center space-x-2">
         <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Nexalog</h1>
+        {/* <Image
+          src="./logo.png"
+          alt="Logo"
+          width={32}
+          height={32}
+          className="w-8 h-8 rounded-full"
+        /> */}
       </div>
 
       {/* Status + Controls */}

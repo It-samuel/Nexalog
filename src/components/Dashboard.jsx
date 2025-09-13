@@ -27,7 +27,7 @@ const Dashboard = ({ qrCode, config, messages, contacts, groups }) => {
 
   setSending(true);
   try {
-    const response = await fetch(`${API_BASE}/api/send-message`, {
+    const response = await fetch(`${API_BASE}/send-message`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
